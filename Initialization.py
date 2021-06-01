@@ -69,7 +69,6 @@ def findStats(layer):
 
 def recurWeights(layer):
     global layerNum
-    print(type(layer))
     if np.isscalar(layer[0]):
         findStats(layer)
         plotDist(layer)
