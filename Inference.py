@@ -2,10 +2,10 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-f = open("./Networks/Model_1_elu_weights.pickle", "rb")
+f = open("./Model_1_elu_weights.pickle", "rb")
 weights = pickle.load(f)
 
-# f = open("./Networks/modelStats.pickle", "rb")
+# f = open("./modelStats.pickle", "rb")
 # storedStats = pickle.load(f)
 
 g = open("./layerpdfs.pickle", "rb")
@@ -32,11 +32,8 @@ def testDists(layer, numLayer):
     # Calculate the CDF
     cdf = np.cumsum(pdf)
 
+    # TODO: Compare CDF/PDF to stored version
 
-    # Add to final
-    distsCDF.append(cdf)
-    distsPDF.append(pdf)
-    binsArr.append(bins)
 
 
 # def testStats(layer, count):
@@ -80,18 +77,18 @@ def testDists(layer, numLayer):
 # plt.show()
 
 #Iterate through each layer
-for i in weights:
-    # If layer has filters, treat each filter as a layer
-    if len(i[0]) > 1:
-        for j in i:
-            # testStats(j, layerNum)
-            testDists(j,layerNum)
-            layerNum += 1
-    else:
-        # testStats(i, layerNum)
-        plotDist(i, layerNum)
+
+def recurWeights(layer):
+    global layerNum
+    if np.isscalar(layer[0]):
+        #testStats(layer, layerNum)
+        testDists(layer, layerNum)
         layerNum += 1
+    else:
+        for j in layer:
+            recurWeights(j)
 
 
+recurWeights(weights)
 
 
