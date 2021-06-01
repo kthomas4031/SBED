@@ -2,39 +2,43 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-f = open("./Model_1_elu_weights.pickle", "rb")
+f = open("./Networks/Model_MNIST_elu_weights.pickle", "rb")
 weights = pickle.load(f)
 
 # f = open("./modelStats.pickle", "rb")
 # storedStats = pickle.load(f)
 
-g = open("./layerpdfs.pickle", "rb")
+g = open("./elu/MNISTlayerpdfs.pickle", "rb")
 pdfs = pickle.load(g)
-h = open("./layercdfs.pickle", "rb")
+h = open("./elu/MNISTlayercdfs.pickle", "rb")
 cdfs = pickle.load(h)
-b = open("./bins.pickle", "rb")
+b = open("./elu/MNISTbins.pickle", "rb")
 bins_count = pickle.load(b)
 
-
-distsPDF = []
-distsCDF = []
-binsArr = []
 errorLayers = []
 layerNum = 0
 
 def testDists(layer, numLayer):
     # Getting data of the histogram
     count, bins = np.histogram(layer, bins=10)
-
+    error = 0
     # Finding the PDF of the histogram using count values
-    pdf = count / sum(count)
+    layerpdf = count / sum(count)
 
     # Calculate the CDF
-    cdf = np.cumsum(pdf)
+    layercdf = np.cumsum(layerpdf)
 
-    # TODO: Compare CDF/PDF to stored version
+    for i in range(len(layerpdf)):
+        if layerpdf[i] != pdfs[numLayer][i] or layercdf[i] != cdfs[numLayer][i]:
+            print("Layer %d Error" % numLayer)
+            error = 1
 
-
+    if error == 1:
+        # print(layerpdf)
+        # print(pdfs[numLayer])
+        # print(layercdf)
+        # print(cdfs[numLayer])
+        errorLayers.append(numLayer)
 
 # def testStats(layer, count):
 #     # Initialize stats for current layer to ensure consistency
@@ -88,6 +92,10 @@ def recurWeights(layer):
         for j in layer:
             recurWeights(j)
 
+# for cdf in cdfs:
+#     print(cdf)
+# print(np.shape(pdfs))
+# print(weights)
 
 recurWeights(weights)
 
