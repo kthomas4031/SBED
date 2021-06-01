@@ -8,23 +8,6 @@ f = open("./Networks/Model_MNIST_elu_weights.pickle", "rb")
 weights = pickle.load(f)
 weights = np.asarray(weights, dtype=object)
 
-# print("Dims = %i" % weights[0].ndim)
-print(weights.shape)
-print(weights[0].shape)
-np.reshape(weights[0], (3, 3, 32))
-# print(weights[0][0].shape)
-#
-# for i in weights:
-#     for j in i:
-#         if len(j[0]) > 1:
-#             for k in j:
-#                 print(k.shape)
-#                 #print("\n ............................................ \n")
-#         else:
-#             print(j.shape)
-#         #print("\n ----------------------------------- \n")
-#     #print("\n \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ \n")
-
 # Temp arrays for code clarity
 avg = []
 maxi = []
@@ -64,7 +47,7 @@ def findStats(layer):
     tempMax = 0
     tempAvg = 0
 
-    print(layer)
+    #print(layer)
 
     # Iterate through parameters in the layer and calculate stats
     for parameter in layer:
@@ -82,11 +65,11 @@ def findStats(layer):
     avg.append(tempAvg)
 
 for i in weights:
-    if type(i[0]) != 'numpy.float32':
+    if type(i[0]) is np.ndarray:
         for a in i:
-            if type(a[0]) != 'numpy.float32':
+            if type(a[0]) is np.ndarray:
                 for b in a:
-                    if type(b[0]) != 'numpy.float32':
+                    if type(b[0]) is np.ndarray:
                         for c in b:
                             findStats(c)
                             plotDist(c, layerNum)
