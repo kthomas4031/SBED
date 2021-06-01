@@ -2,10 +2,10 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-f = open("./Model_1_elu_weights.pickle", "rb")
+f = open("./Networks/Model_1_elu_weights.pickle", "rb")
 weights = pickle.load(f)
 
-# f = open("./modelStats.pickle", "rb")
+# f = open("./Networks/modelStats.pickle", "rb")
 # storedStats = pickle.load(f)
 
 g = open("./layerpdfs.pickle", "rb")
