@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # f = open("./Model_1_elu_weights.pickle", "rb")
-f = open("./Model_MNIST_elu_weights.pickle", "rb")
+f = open("./Networks/Model_MNIST_elu_weights.pickle", "rb")
 
 weights = pickle.load(f)
 weights = np.asarray(weights, dtype=object)
