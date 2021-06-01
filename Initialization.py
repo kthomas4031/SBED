@@ -9,8 +9,9 @@ weights = pickle.load(f)
 weights = np.asarray(weights, dtype=object)
 
 # print("Dims = %i" % weights[0].ndim)
-# print(weights.shape)
-# print(weights[0].shape)
+print(weights.shape)
+print(weights[0].shape)
+np.reshape(weights[0], (3, 3, 32))
 # print(weights[0][0].shape)
 #
 # for i in weights:
@@ -80,15 +81,13 @@ def findStats(layer):
     maxi.append(tempMax)
     avg.append(tempAvg)
 
-# Iterate through each layer, handling extra dimensions
 for i in weights:
-    if len(i[0]) > 1:
+    if type(i[0]) != 'numpy.float32':
         for a in i:
-            if len(a[0]) > 1:
+            if type(a[0]) != 'numpy.float32':
                 for b in a:
-                    if len(b[0]) > 1:
+                    if type(b[0]) != 'numpy.float32':
                         for c in b:
-                            c.flatten()
                             findStats(c)
                             plotDist(c, layerNum)
                             layerNum += 1
