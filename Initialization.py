@@ -19,7 +19,8 @@ bins_count = []
 
 layerNum = 0
 
-def plotDist(layer, numLayer):
+
+def plotDist(layer):
     # Getting data of the histogram
     count, bins = np.histogram(layer, bins=10)
 
@@ -39,6 +40,7 @@ def plotDist(layer, numLayer):
     # plt.plot(bins[1:], pdf, color="red", label="PDF%i" %numLayer)
     # plt.plot(bins[1:], cdf, label="CDF%i" %numLayer)
     # plt.legend()
+
 
 def findStats(layer):
     # Initialize stats for current layer to ensure consistency
@@ -64,28 +66,21 @@ def findStats(layer):
     maxi.append(tempMax)
     avg.append(tempAvg)
 
-for i in weights:
-    if type(i[0]) is np.ndarray:
-        for a in i:
-            if type(a[0]) is np.ndarray:
-                for b in a:
-                    if type(b[0]) is np.ndarray:
-                        for c in b:
-                            findStats(c)
-                            plotDist(c, layerNum)
-                            layerNum += 1
-                    else:
-                        findStats(b)
-                        plotDist(b, layerNum)
-                        layerNum += 1
-            else:
-                findStats(a)
-                plotDist(a,layerNum)
-                layerNum += 1
-    else:
-        findStats(i)
-        plotDist(i, layerNum)
+
+def recurWeights(layer):
+    global layerNum
+    print(type(layer))
+    if np.isscalar(layer[0]):
+        findStats(layer)
+        plotDist(layer)
         layerNum += 1
+    else:
+        for j in layer:
+            recurWeights(j)
+
+
+recurWeights(weights)
+
 
 # Converting temp arrays to final output
 for i in range(layerNum):
@@ -99,7 +94,3 @@ pickle.dump(bins_count, open("MNISTbins.pickle", "wb"))
 # pickle.dump(distsPDF, open("layerpdfs.pickle", "wb"))
 # pickle.dump(distsCDF, open("layercdfs.pickle", "wb"))
 # pickle.dump(bins_count, open("bins.pickle", "wb"))
-#plt.show()
-
-#f = open("./modelStats.pickle", "rb")
-#stats = pickle.load(f)
