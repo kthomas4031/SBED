@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # f = open("./Model_1_elu_weights.pickle", "rb")
-f = open("./Networks/Model_MNIST_elu_weights.pickle", "rb")
+f = open("./Networks/Model_1_elu_weights.pickle", "rb")
 
 weights = pickle.load(f)
 weights = np.asarray(weights, dtype=object)
@@ -79,16 +79,16 @@ def recurWeights(layer):
 
 
 recurWeights(weights)
-
+#TODO: Fix recurrence to treat last layer as single layer
 
 # Converting temp arrays to final output
 for i in range(layerNum):
     output.append([i, avg[i], mini[i], maxi[i]])
 
-pickle.dump(output, open("MNISTmodelStats.pickle", "wb"))
-pickle.dump(distsPDF, open("MNISTlayerpdfs.pickle", "wb"))
-pickle.dump(distsCDF, open("MNISTlayercdfs.pickle", "wb"))
-pickle.dump(bins_count, open("MNISTbins.pickle", "wb"))
+pickle.dump(output, open("./elu/1modelStats.pickle", "wb"))
+pickle.dump(distsPDF, open("./elu/1layerpdfs.pickle", "wb"))
+pickle.dump(distsCDF, open("./elu/1layercdfs.pickle", "wb"))
+pickle.dump(bins_count, open("./elu/1bins.pickle", "wb"))
 # pickle.dump(output, open("modelStats.pickle", "wb"))
 # pickle.dump(distsPDF, open("layerpdfs.pickle", "wb"))
 # pickle.dump(distsCDF, open("layercdfs.pickle", "wb"))
