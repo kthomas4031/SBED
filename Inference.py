@@ -1,18 +1,21 @@
+
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-f = open("./Networks/Model_MNIST_elu_weights.pickle", "rb")
+f = open("./RandomlyCorruptedNetworks/Model_1_elu_weights.pickle", "rb")
 weights = pickle.load(f)
+weights = np.asarray(weights, dtype=object)
+weights[-1] = weights[-1].flatten()
 
 # f = open("./modelStats.pickle", "rb")
 # storedStats = pickle.load(f)
 
-g = open("./elu/MNISTlayerpdfs.pickle", "rb")
+g = open("./elu/1layerpdfs.pickle", "rb")
 pdfs = pickle.load(g)
-h = open("./elu/MNISTlayercdfs.pickle", "rb")
+h = open("./elu/1layercdfs.pickle", "rb")
 cdfs = pickle.load(h)
-b = open("./elu/MNISTbins.pickle", "rb")
+b = open("./elu/1bins.pickle", "rb")
 bins_count = pickle.load(b)
 
 errorLayers = []
@@ -30,14 +33,10 @@ def testDists(layer, numLayer):
 
     for i in range(len(layerpdf)):
         if layerpdf[i] != pdfs[numLayer][i] or layercdf[i] != cdfs[numLayer][i]:
-            print("Layer %d Error" % numLayer)
             error = 1
 
     if error == 1:
-        # print(layerpdf)
-        # print(pdfs[numLayer])
-        # print(layercdf)
-        # print(cdfs[numLayer])
+        print("Layer %d Error" % numLayer)
         errorLayers.append(numLayer)
 
 # def testStats(layer, count):
@@ -92,10 +91,6 @@ def recurWeights(layer):
         for j in layer:
             recurWeights(j)
 
-# for cdf in cdfs:
-#     print(cdf)
-# print(np.shape(pdfs))
-# print(weights)
 
 recurWeights(weights)
 
