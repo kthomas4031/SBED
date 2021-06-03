@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 f = open("./Networks/Model_1_elu_weights.pickle", "rb")
 
 weights = pickle.load(f)
-#weights = np.asarray(weights, dtype=object)
-#weights[-1][-1].flatten()
-print(weights)
+weights = np.asarray(weights, dtype=object)
+weights[-1] = weights[-1].flatten()
+#print(weights)
 
 # Temp arrays for code clarity
 avg = []
@@ -91,6 +91,3 @@ pickle.dump(output, open("./elu/1modelStats.pickle", "wb"))
 pickle.dump(distsPDF, open("./elu/1layerpdfs.pickle", "wb"))
 pickle.dump(distsCDF, open("./elu/1layercdfs.pickle", "wb"))
 pickle.dump(bins_count, open("./elu/1bins.pickle", "wb"))
-
-for i in output:
-    print(i)
