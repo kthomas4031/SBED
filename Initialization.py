@@ -1,26 +1,7 @@
 import pickle
 import numpy as np
+import os
 import matplotlib.pyplot as plt
-
-# f = open("./Model_1_elu_weights.pickle", "rb")
-f = open("./Networks/Model_1_elu_weights.pickle", "rb")
-
-weights = pickle.load(f)
-weights = np.asarray(weights, dtype=object)
-weights[-1] = weights[-1].flatten()
-#print(weights)
-
-# Temp arrays for code clarity
-avg = []
-maxi = []
-mini = []
-output = []
-distsPDF = []
-distsCDF = []
-bins_count = []
-
-layerNum = 0
-
 
 def plotDist(layer):
     # Getting data of the histogram
@@ -80,14 +61,33 @@ def recurWeights(layer):
             recurWeights(j)
 
 
-recurWeights(weights)
-#TODO: Fix recurrence to treat last layer as single layer
 
-# Converting temp arrays to final output
-for i in range(layerNum):
-    output.append([i, avg[i], mini[i], maxi[i]])
+directory = r'./Networks'
 
-pickle.dump(output, open("./elu/1modelStats.pickle", "wb"))
-pickle.dump(distsPDF, open("./elu/1layerpdfs.pickle", "wb"))
-pickle.dump(distsCDF, open("./elu/1layercdfs.pickle", "wb"))
-pickle.dump(bins_count, open("./elu/1bins.pickle", "wb"))
+for filename in os.listdir(directory):
+    f = open("./Networks/%s"%filename, "rb")
+    weights = pickle.load(f)
+    weights = np.asarray(weights, dtype=object)
+    weights[-1] = weights[-1].flatten()
+    # print(weights)
+
+    # Temp arrays for code clarity
+    avg = []
+    maxi = []
+    mini = []
+    output = []
+    distsPDF = []
+    distsCDF = []
+    bins_count = []
+
+    layerNum = 0
+    recurWeights(weights)
+
+    # Converting temp arrays to final output
+    for i in range(layerNum):
+        output.append([i, avg[i], mini[i], maxi[i]])
+
+    pickle.dump(output, open("./stats%s"%filename, "wb"))
+    pickle.dump(distsPDF, open("./pdfs%s"%filename, "wb"))
+    pickle.dump(distsCDF, open("./cdfs%s"%filename, "wb"))
+    pickle.dump(bins_count, open("./bins%s"%filename, "wb"))
