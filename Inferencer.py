@@ -20,16 +20,16 @@ def checkdists(layer, numLayer):
         errorLayers.append(numLayer)
 
 
-    plt.plot(bins[1:], layerpdf, color="blue", label="PDF%i" %numLayer)
-    plt.plot(bins[1:], pdfs[numLayer], color="orange", label="CorruptedPDF%i" % numLayer)
-    plt.plot(bins[1:], layercdf, color="green", label="CDF%i" %numLayer)
-    plt.plot(bins[1:], cdfs[numLayer], color="red", label="CorruptedCDF%i" %numLayer)
-    plt.xlim([-2, 2])
-    plt.legend()
-    plt.figtext(.8, .8, "Layer Size = %d"%len(layer))
-    #plt.show()
-    plt.savefig('./SingleBitFlipped/Layer%03d.png'%numLayer)
-    plt.clf()
+    # plt.plot(bins[1:], layerpdf, color="blue", label="PDF%i" %numLayer)
+    # plt.plot(bins_count[numLayer][1:], pdfs[numLayer], color="orange", label="CorruptedPDF%i" % numLayer)
+    # plt.plot(bins[1:], layercdf, color="green", label="CDF%i" %numLayer)
+    # plt.plot(bins_count[numLayer][1:], cdfs[numLayer], color="red", label="CorruptedCDF%i" %numLayer)
+    # plt.xlim([-1.5, 1])
+    # plt.legend()
+    # plt.figtext(.8, .8, "Layer Size = %d"%len(layer))
+    # #plt.show()
+    # plt.savefig('./Results/RoundingSim/Layer%03d.png'%numLayer)
+    # plt.clf()
 
 # def testStats(layer, count):
 #     # Initialize stats for current layer to ensure consistency
@@ -85,7 +85,7 @@ def recurWeights(layers):
 
 print(os.getcwd())
 filename = "Model_MalwareCDNN_elu_weights.pickle"
-f = open("./Networks/SingleBitCorrupted/%s"%filename, "rb")
+f = open("./Networks/CypherBitCorrupted/%s"%filename, "rb")
 weights = pickle.load(f)
 weights = np.asarray(weights, dtype=object)
 weights[-1] = weights[-1].flatten()

@@ -19,13 +19,13 @@ def recurWeights(layer):
             recurWeights(j)
 
 
-directory = r'./Networks'
+directory = r'./Networks/Original'
 
 for filename in os.listdir(directory):
-    f = open("./Networks/%s"%filename, "rb")
+    f = open("./Networks/Original/%s"%filename, "rb")
     weights = pickle.load(f)
     weights[-1] = weights[-1].flatten()
 
     recurWeights(weights)
 
-    pickle.dump(weights, open("./RandomlyCorruptedNetworks/%s" % filename, "wb"))
+    pickle.dump(weights, open("./Networks/RandomlyCorrupted/%s" % filename, "wb"))

@@ -18,22 +18,25 @@ def bitflip(x,pos):
 # Flips one bit per layer
 def recurWeights(layer):
     if np.isscalar(layer[0]):
-        weightChoice = random.randrange(0, len(layer))
+        weightChoice = random.randrange(0, len(layer)-4)
         #layer[weightChoice] = bitflip(layer[weightChoice], random.randrange(0, 6))
-        layer[weightChoice] += 2
+        layer[weightChoice] += 1
+        # layer[weightChoice+1] += 1
+        # layer[weightChoice+1] += 1
+        # layer[weightChoice+1] += 1
     else:
         for j in layer:
             recurWeights(j)
 
 
-directory = r'./Networks'
+directory = r'./Networks/Original'
 
 for filename in os.listdir(directory):
-    f = open("./Networks/%s"%filename, "rb")
+    f = open("./Networks/Original/%s"%filename, "rb")
     weights = pickle.load(f)
     weights[-1] = weights[-1].flatten()
 
     recurWeights(weights)
 
-    pickle.dump(weights, open("./SingleBitCorruptedNetworks/%s" % filename, "wb"))
+    pickle.dump(weights, open("./Networks/SingleBitCorrupted/%s" % filename, "wb"))
 
