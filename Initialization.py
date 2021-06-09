@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def plotDist(layer):
     # Getting data of the histogram
-    count, bins = np.histogram(layer, bins=10)
+    count, bins = np.histogram(layer, bins=100)
 
     # Finding the PDF of the histogram using count values
     pdf = count / sum(count)
@@ -31,8 +31,6 @@ def findStats(layer):
     tempMin = 99
     tempMax = 0
     tempAvg = 0
-
-    #print(layer)
 
     # Iterate through parameters in the layer and calculate stats
     for parameter in layer:
