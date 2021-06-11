@@ -20,10 +20,10 @@ def recurWeights(layer):
     if np.isscalar(layer[0]):
         weightChoice = random.randrange(0, len(layer)-4)
         #layer[weightChoice] = bitflip(layer[weightChoice], random.randrange(0, 6))
-        layer[weightChoice] += 1
-        # layer[weightChoice+1] += 1
-        # layer[weightChoice+1] += 1
-        # layer[weightChoice+1] += 1
+        layer[weightChoice] += 0.1
+        layer[weightChoice+1] += 0.1
+        layer[weightChoice+1] += 0.1
+        layer[weightChoice+1] += 0.1
     else:
         for j in layer:
             recurWeights(j)
@@ -38,5 +38,5 @@ for filename in os.listdir(directory):
 
     recurWeights(weights)
 
-    pickle.dump(weights, open("./Networks/SingleBitCorrupted/%s" % filename, "wb"))
+    pickle.dump(weights, open("./Networks/CypherBitCorrupted/%s" % filename, "wb"))
 
