@@ -19,14 +19,13 @@ def checkdists(layer, numLayer):
         print("Layer %d Error Diff = %f" % (numLayer, sumDiff))
         errorLayers.append(numLayer)
 
-
     plt.plot(bins[1:], layerpdf, color="blue", label="PDF%i" %numLayer)
     plt.plot(bins_count[numLayer][1:], pdfs[numLayer], color="orange", label="CorruptedPDF%i" % numLayer)
     plt.plot(bins[1:], layercdf, color="green", label="CDF%i" %numLayer)
     plt.plot(bins_count[numLayer][1:], cdfs[numLayer], color="red", label="CorruptedCDF%i" %numLayer)
-    plt.xlim([-1.5, 1])
+    plt.xlim([min(layerpdf), max(layerpdf)])
     plt.legend()
-    plt.figtext(.8, .8, "Layer Size = %d"%len(layer))
+    plt.figtext(.8, .8, "Layer Size \n= %d"%len(layer))
     #plt.show()
     plt.savefig('./Results/CypherBitFlipped/Layer%03d.png'%numLayer)
     plt.clf()
