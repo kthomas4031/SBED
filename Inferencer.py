@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 def checkdists(layer, numLayer):
     # Getting data of the histogram
     count, bins = np.histogram(layer, bins=100)
+
+    global totalNetwork
+    totalNetwork = np.append(totalNetwork, layer)
+
     # Finding the PDF of the histogram using count values
     layerpdf = count / sum(count)
 
@@ -97,7 +101,29 @@ cdfs = pickle.load(h)
 b = open("./elu/bins%s"%filename, "rb")
 bins_count = pickle.load(b)
 
+totalNetwork = []
 errorLayers = []
 layerNum = 0
 
 recurWeights(weights)
+
+# Calculate for total network
+count, bins = np.histogram(totalNetwork, bins=100)
+networkpdf = count / sum(count)
+networkcdf = np.cumsum(networkpdf)
+
+sumPDF = abs(pdfs[-1] - networkpdf)
+sumDiff = sum(sumPDF)/len(networkpdf)
+
+if sumDiff > 0:
+    print("Network Error Diff = %f" % sumDiff)
+
+plt.plot(bins[1:], networkpdf, color="blue", label="Network PDF")
+plt.plot(bins_count[-1][1:], pdfs[-1], color="orange", label="Corrupted Network PDF")
+plt.plot(bins[1:], networkcdf, color="green", label="Network CDF")
+plt.plot(bins_count[-1][1:], cdfs[-1], color="red", label="Corrupted Network CDF")
+plt.xlim([-2, 2])
+plt.legend()
+#plt.show()
+plt.savefig('./Results/CypherBitFlipped/TotalNetwork.png')
+plt.clf()
