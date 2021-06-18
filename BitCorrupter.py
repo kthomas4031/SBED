@@ -2,28 +2,35 @@ import pickle
 import numpy as np
 import random
 import os
-from struct import pack, unpack
+import struct
 
 
-def bitflip(x,pos):
-    fs = pack('f',x)
-    bval = list(unpack('BBBB',fs))
-    [q,r] = divmod(pos,8)
-    bval[q] ^= 1 << r
-    fs = pack('BBBB', *bval)
-    fnew=unpack('f',fs)
-    return fnew[0]
+def float_to_bin(num):
+    return format(struct.unpack('!I', struct.pack('!f', num))[0], '032b')
+
+
+def bin_to_float(binary):
+    return struct.unpack('!f', struct.pack('!I', int(binary, 2)))[0]
 
 
 # Flips one bit per layer
 def recurWeights(layer):
     if np.isscalar(layer[0]):
-        weightChoice = random.randrange(0, len(layer)-4)
-        #layer[weightChoice] = bitflip(layer[weightChoice], random.randrange(0, 6))
-        layer[weightChoice] += 0.1
-        layer[weightChoice+1] += 0.1
-        layer[weightChoice+1] += 0.1
-        layer[weightChoice+1] += 0.1
+        weightChoice = random.randrange(0, len(layer)-1)
+        print(layer[weightChoice])
+        change = float_to_bin(layer[weightChoice])
+        shift = ""
+
+        for i in range(32):
+            if i == bitCount:
+                shift += "1"
+            else:
+                shift += "0"
+        print(shift)
+        change = [str(int(change[i]) ^ int(shift[i])) for i in range(len(shift))]
+        change = ''.join(change)
+        layer[weightChoice] = bin_to_float(change)
+        print(layer[weightChoice])
     else:
         for j in layer:
             recurWeights(j)
@@ -32,11 +39,11 @@ def recurWeights(layer):
 directory = r'./Networks/Original'
 
 for filename in os.listdir(directory):
-    f = open("./Networks/Original/%s"%filename, "rb")
-    weights = pickle.load(f)
-    weights[-1] = weights[-1].flatten()
+    for bitCount in range(32):
+        f = open("./Networks/Original/%s" % filename, "rb")
+        weights = pickle.load(f)
+        weights[-1] = weights[-1].flatten()
+        recurWeights(weights)
 
-    recurWeights(weights)
-
-    pickle.dump(weights, open("./Networks/CypherBitCorrupted/%s" % filename, "wb"))
+        pickle.dump(weights, open("./Networks/SingleBitCorrupted/Bit-%02d/%s" % (bitCount, filename), "wb"))
 
