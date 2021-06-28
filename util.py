@@ -1,5 +1,5 @@
 
-import keras
+import Keras
 import numpy as np
 
 def get_weights(model):
