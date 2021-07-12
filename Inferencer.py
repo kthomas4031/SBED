@@ -3,36 +3,22 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-def checkdists(layer, numLayer):
+
+def checkdists(layer, numLayer, pdfs, cdfs):
     # Getting data of the histogram
     count, bins = np.histogram(layer, bins=100)
-
-    # global totalNetwork
-    # totalNetwork = np.append(totalNetwork, layer)
 
     # Finding the PDF of the histogram using count values
     layerpdf = count / sum(count)
 
     # Calculate the CDF
     layercdf = np.cumsum(layerpdf)
+    sumPDF = sum(abs(pdfs[numLayer] - layerpdf))
+    sumCDF = sum(abs(cdfs[numLayer] - layercdf))
 
-    sumPDF = abs(pdfs[numLayer] - layerpdf)
-    sumDiff = sum(sumPDF)
-
-    if sumDiff > 0:
-        print("Layer %d Error Diff(%s) = %f" % (numLayer, fold, sumDiff))
+    if sumCDF > 0 or sumPDF > 0:
+        # print("Layer %d Error Diff = %f" % (numLayer, sumPDF))
         errorLayers.append(numLayer)
-
-    # plt.plot(bins[1:], layerpdf, color="blue", label="PDF%i" %numLayer)
-    # plt.plot(bins_count[numLayer][1:], pdfs[numLayer], color="orange", label="CorruptedPDF%i" % numLayer)
-    # plt.plot(bins[1:], layercdf, color="green", label="CDF%i" %numLayer)
-    # plt.plot(bins_count[numLayer][1:], cdfs[numLayer], color="red", label="CorruptedCDF%i" %numLayer)
-    # plt.xlim([-1, 1])
-    # plt.legend()
-    # plt.figtext(.8, .8, "Layer Size \n= %d"%len(layer))
-    # #plt.show()
-    # plt.savefig('./Results/SingleBitFlipped/%s/Layer%03d.png'%(fold, numLayer))
-    # plt.clf()
 
 # def testStats(layer, count):
 #     # Initialize stats for current layer to ensure consistency
@@ -76,56 +62,46 @@ def checkdists(layer, numLayer):
 
 #Iterate through each layer
 
-def recurWeights(layers):
+
+def recurWeights(layers, pdfs, cdfs):
     global layerNum
     if np.isscalar(layers[0]):
-        #testStats(layer, layerNum)
-        checkdists(layers, layerNum)
+        checkdists(layers, layerNum, pdfs, cdfs)
         layerNum += 1
     else:
         for j in layers:
-            recurWeights(j)
+            recurWeights(j, pdfs, cdfs)
 
 
-filename = "Model_1_elu_weights.pickle"
-
-for fold in os.listdir("./Networks/SingleBitCorrupted/"):
-    f = open("./Networks/SingleBitCorrupted/%s/%s" %(fold, filename), "rb")
-    weights = pickle.load(f)
-    weights = np.asarray(weights, dtype=object)
-    weights[-1] = weights[-1].flatten()
-
-
-    g = open("./elu/pdfs%s"%filename, "rb")
+def inferenceCalc(network_weights):
+    network_weights = np.asarray(network_weights, dtype=object)
+    network_weights[-1] = network_weights[-1].flatten()
+    g = open("./pdfsMNIST", "rb")
     pdfs = pickle.load(g)
-    h = open("./elu/cdfs%s"%filename, "rb")
+    h = open("./cdfsMNIST", "rb")
     cdfs = pickle.load(h)
-    b = open("./elu/bins%s"%filename, "rb")
-    bins_count = pickle.load(b)
+    recurWeights(network_weights, pdfs, cdfs)
+    return errorLayers
 
-    # totalNetwork = []
-    errorLayers = []
-    layerNum = 0
+# filename = "Model_1_elu_weights.pickle"
+#
+# for fold in os.listdir("./Networks/SingleBitCorrupted/"):
+#     f = open("./Networks/SingleBitCorrupted/%s/%s" %(fold, filename), "rb")
+#     weights = pickle.load(f)
+#     weights = np.asarray(weights, dtype=object)
+#     weights[-1] = weights[-1].flatten()
+#
+#
+#     g = open("./elu/pdfs%s"%filename, "rb")
+#     pdfs = pickle.load(g)
+#     h = open("./elu/cdfs%s"%filename, "rb")
+#     cdfs = pickle.load(h)
+#     b = open("./elu/bins%s"%filename, "rb")
+#     bins_count = pickle.load(b)
+#
+#     # totalNetwork = []
+errorLayers = []
+layerNum = 0
+#
+#     recurWeights(weights)
 
-    recurWeights(weights)
-
-    # Calculate for total network
-    # count, bins = np.histogram(totalNetwork, bins=100)
-    # networkpdf = count / sum(count)
-    # networkcdf = np.cumsum(networkpdf)
-    #
-    # sumPDF = abs(pdfs[-1] - networkpdf)
-    # sumDiff = sum(sumPDF)
-    #
-    # print("Network Error Diff = %f" % sumDiff)
-    f.close()
-
-    # plt.plot(bins[1:], networkpdf, color="blue", label="Network PDF")
-    # plt.plot(bins_count[-1][1:], pdfs[-1], color="orange", label="Corrupted Network PDF")
-    # plt.plot(bins[1:], networkcdf, color="green", label="Network CDF")
-    # plt.plot(bins_count[-1][1:], cdfs[-1], color="red", label="Corrupted Network CDF")
-    # plt.xlim([-2, 2])
-    # plt.legend()
-    # #plt.show()
-    # plt.savefig('./Results/CypherBitFlipped/TotalNetwork.png')
-    # plt.clf()
