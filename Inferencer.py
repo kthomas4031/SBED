@@ -16,7 +16,7 @@ def checkdists(layer, numLayer, pdfs, cdfs):
     sumPDF = sum(abs(pdfs[numLayer] - layerpdf))
     sumCDF = sum(abs(cdfs[numLayer] - layercdf))
 
-    if sumCDF > 0 or sumPDF > 0:
+    if sumCDF >= 0.015 or sumPDF >= 0.015:
         # print("Layer %d Error Diff = %f" % (numLayer, sumPDF))
         errorLayers.append(numLayer)
 

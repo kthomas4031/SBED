@@ -5,8 +5,8 @@ from tensorflow.keras.datasets import cifar10, mnist
 from tensorflow.keras.utils import to_categorical
 import struct
 import random
-from Initialization import *
-from Inferencer import *
+from hypothesis_detector import *
+from hypothesis_detection_init import *
 import time
 import sys
 
@@ -26,8 +26,10 @@ def manipulate_cipher_bit(model_weights, per_weight_manipulation):
     model_weights[i_d] = model_weights[i_d].flatten()
     for j in range(per_weight_manipulation):
         rand = random.randrange(0, len(model_weights[i_d]) - 4)
-        change = [float_to_bin(model_weights[i_d][rand]), float_to_bin(model_weights[i_d][rand+1]),
-                  float_to_bin(model_weights[i_d][rand+2]), float_to_bin(model_weights[i_d][rand+3])]
+        change = [float_to_bin(model_weights[i_d][rand]), float_to_bin(model_weights[i_d][rand + 1]),
+                  float_to_bin(model_weights[i_d][rand + 2]), float_to_bin(model_weights[i_d][rand + 3]),]
+                  # float_to_bin(model_weights[i_d][rand + 4]), float_to_bin(model_weights[i_d][rand + 5]),
+                  # float_to_bin(model_weights[i_d][rand + 6]), float_to_bin(model_weights[i_d][rand + 7])]
         for i_s in range(4):
             shift = ""
             rand_mod = random.sample(range(31), 16)
@@ -129,20 +131,22 @@ print(x_test.shape[0], "test samples")
 y_train = to_categorical(y_train, num_classes)
 y_test = to_categorical(y_test, num_classes)
 
+bit_pos = 0
+
 try:
+    # for bit_pos in range(32):
     errorsDetected = 0
     acc_avg = []
     t_avg = []
     loss_avg = []
-    bit_pos = sys.argv[1]
-    for i in range(1000):
+    for i in range(50):
         model = keras.models.load_model("MNIST_model")
         weights, bias = get_weights(model)
 
         # Initialize for error detection
-        initializeDists(weights)
+        plot_layer(weights)
 
-        bit_flipped_weights = manipulate_single_bit(weights, 1, bit_pos)
+        bit_flipped_weights = manipulate_cipher_bit(weights, 1)
 
         bit_flipped_model = set_weights(model, bit_flipped_weights, bias)
 
@@ -152,15 +156,17 @@ try:
 
         # Detect Error
         t0 = time.time()
-        errorLayers = inferenceCalc(bit_flipped_weights)
-        if len(errorLayers) > 0:
+        errors = check_layer(bit_flipped_weights)
+        if errors > 0:
             errorsDetected += 1
         t1 = time.time()
         t_avg.append(t1 - t0)
+
     acc_avg = sum(acc_avg) / len(acc_avg)
     loss_avg = sum(loss_avg) / len(loss_avg)
-    print("Bit Pos: %d\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
+    print("Bit Pos: %s\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
           %(bit_pos, acc_avg, loss_avg, t_avg[0], errorsDetected))
+
 except:
     print("Exception Occurred")
 

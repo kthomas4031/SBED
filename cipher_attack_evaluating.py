@@ -134,15 +134,14 @@ try:
     acc_avg = []
     t_avg = []
     loss_avg = []
-    bit_pos = sys.argv[1]
-    for i in range(1000):
+    for i in range(10000):
         model = keras.models.load_model("MNIST_model")
         weights, bias = get_weights(model)
 
         # Initialize for error detection
         initializeDists(weights)
 
-        bit_flipped_weights = manipulate_single_bit(weights, 1, bit_pos)
+        bit_flipped_weights = manipulate_cipher_bit(weights, 1)
 
         bit_flipped_model = set_weights(model, bit_flipped_weights, bias)
 
@@ -159,8 +158,8 @@ try:
         t_avg.append(t1 - t0)
     acc_avg = sum(acc_avg) / len(acc_avg)
     loss_avg = sum(loss_avg) / len(loss_avg)
-    print("Bit Pos: %d\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
-          %(bit_pos, acc_avg, loss_avg, t_avg[0], errorsDetected))
+    print("Avg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
+          %(acc_avg, loss_avg, t_avg[0], errorsDetected))
 except:
     print("Exception Occurred")
 
