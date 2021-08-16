@@ -52,9 +52,7 @@ def manipulate_single_bit(model_weights, per_weight_manipulation, bit_position):
         rand = random.randrange(0, len(model_weights[i_d]) - 1)
         change = float_to_bin(model_weights[i_d][rand])
         shift = ""
-        # rand_mod = random.randint(0, 31)
         rand_mod = bit_position
-        # rand_mod = 10
         for i in range(32):
             if i == rand_mod:
                 shift += "1"
@@ -130,37 +128,38 @@ y_train = to_categorical(y_train, num_classes)
 y_test = to_categorical(y_test, num_classes)
 
 try:
-    errorsDetected = 0
-    acc_avg = []
-    t_avg = []
-    loss_avg = []
-    bit_pos = sys.argv[1]
-    for i in range(1000):
-        model = keras.models.load_model("MNIST_model")
-        weights, bias = get_weights(model)
+    for bit_pos in range(8,32):
+        errorsDetected = 0
+        acc_avg = []
+        t_avg = []
+        loss_avg = []
 
-        # Initialize for error detection
-        initializeDists(weights)
+        for i in range(50):
+            model = keras.models.load_model("MNIST_model")
+            weights, bias = get_weights(model)
 
-        bit_flipped_weights = manipulate_single_bit(weights, 1, bit_pos)
+            # Initialize for error detection
+            initializeDists(weights)
 
-        bit_flipped_model = set_weights(model, bit_flipped_weights, bias)
+            bit_flipped_weights = manipulate_single_bit(weights, 20, bit_pos)
 
-        score = bit_flipped_model.evaluate(x_test, y_test, verbose=0)
-        loss_avg.append(score[0])
-        acc_avg.append(score[1])
+            bit_flipped_model = set_weights(model, bit_flipped_weights, bias)
 
-        # Detect Error
-        t0 = time.time()
-        errorLayers = inferenceCalc(bit_flipped_weights)
-        if len(errorLayers) > 0:
-            errorsDetected += 1
-        t1 = time.time()
-        t_avg.append(t1 - t0)
-    acc_avg = sum(acc_avg) / len(acc_avg)
-    loss_avg = sum(loss_avg) / len(loss_avg)
-    print("Bit Pos: %d\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
-          %(bit_pos, acc_avg, loss_avg, t_avg[0], errorsDetected))
+            score = bit_flipped_model.evaluate(x_test, y_test, verbose=0)
+            loss_avg.append(score[0])
+            acc_avg.append(score[1])
+
+            # Detect Error
+            t0 = time.time()
+            errorLayers = inferenceCalc(bit_flipped_weights)
+            if len(errorLayers) > 0:
+                errorsDetected += 1
+            t1 = time.time()
+            t_avg.append(t1 - t0)
+        acc_avg = sum(acc_avg) / len(acc_avg)
+        loss_avg = sum(loss_avg) / len(loss_avg)
+        print("Bit Pos: %d\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
+              %(bit_pos, acc_avg, loss_avg, t_avg[0], errorsDetected))
 except:
     print("Exception Occurred")
 

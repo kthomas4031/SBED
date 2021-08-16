@@ -25,12 +25,12 @@ def manipulate_cipher_bit(model_weights, per_weight_manipulation):
     old_shape = model_weights[i_d].shape
     model_weights[i_d] = model_weights[i_d].flatten()
     for j in range(per_weight_manipulation):
-        rand = random.randrange(0, len(model_weights[i_d]) - 4)
+        rand = random.randrange(0, len(model_weights[i_d]) - 8)
         change = [float_to_bin(model_weights[i_d][rand]), float_to_bin(model_weights[i_d][rand + 1]),
-                  float_to_bin(model_weights[i_d][rand + 2]), float_to_bin(model_weights[i_d][rand + 3]),]
-                  # float_to_bin(model_weights[i_d][rand + 4]), float_to_bin(model_weights[i_d][rand + 5]),
-                  # float_to_bin(model_weights[i_d][rand + 6]), float_to_bin(model_weights[i_d][rand + 7])]
-        for i_s in range(4):
+                  float_to_bin(model_weights[i_d][rand + 2]), float_to_bin(model_weights[i_d][rand + 3]),
+                  float_to_bin(model_weights[i_d][rand + 4]), float_to_bin(model_weights[i_d][rand + 5]),
+                  float_to_bin(model_weights[i_d][rand + 6]), float_to_bin(model_weights[i_d][rand + 7])]
+        for i_s in range(8):
             shift = ""
             rand_mod = random.sample(range(31), 16)
             for i in range(32):
@@ -134,12 +134,13 @@ y_test = to_categorical(y_test, num_classes)
 bit_pos = 0
 
 try:
-    # for bit_pos in range(32):
+    # for bit_pos in range(2,32):
     errorsDetected = 0
     acc_avg = []
     t_avg = []
     loss_avg = []
-    for i in range(50):
+    big_weights = []
+    for i in range(1000):
         model = keras.models.load_model("MNIST_model")
         weights, bias = get_weights(model)
 
@@ -158,14 +159,31 @@ try:
         t0 = time.time()
         errors = check_layer(bit_flipped_weights)
         if errors > 0:
-            errorsDetected += 1
+            errorsDetected += errors
         t1 = time.time()
         t_avg.append(t1 - t0)
 
+        bit_flipped_weights = np.absolute(bit_flipped_weights)
+        for i in range(len(bit_flipped_weights)):
+            bit_flipped_weights[i] = bit_flipped_weights[i].flatten()
+
+        for i in range(len(bit_flipped_weights)):
+            for j in range(len(bit_flipped_weights[i])):
+                if(bit_flipped_weights[i][j] > 1.05):
+                    big_weights.append(bit_flipped_weights[i][j])
+
+
     acc_avg = sum(acc_avg) / len(acc_avg)
     loss_avg = sum(loss_avg) / len(loss_avg)
-    print("Bit Pos: %s\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f"
-          %(bit_pos, acc_avg, loss_avg, t_avg[0], errorsDetected))
+    big_weights = [abs(ele) for ele in big_weights]
+    big_weights = sorted(big_weights)
+    if len(big_weights) > 0:
+        perc_of_errors = errorsDetected/len(big_weights)
+    else:
+        perc_of_errors = 0
+    print("Bit Pos: %s\nAvg Acc: %f\nAvg Loss: %f\nTime for Check: %f\nErrors Detected: %f\nErrors:%d\nPercent Errors: %f"
+          %(bit_pos, acc_avg, loss_avg, t_avg[0], errorsDetected, len(big_weights), perc_of_errors))
+    print(big_weights)
 
 except:
     print("Exception Occurred")

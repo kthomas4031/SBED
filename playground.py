@@ -143,44 +143,61 @@ def manipulate_single_bit(model_weights, per_weight_manipulation):
     model_weights[i_d] = model_weights[i_d].reshape(old_shape)
     return model_weights
 
-means = []
-sigmas = []
+model = keras.models.load_model("CIFAR10_model")
+weighty, bias = get_weights(model)
 
-for ix in range(100):
-    model = keras.models.load_model("MNIST_model")
-    weight, bias = get_weights(model)
+for i in range(len(weighty)):
+    weighty[i] = weighty[i].flatten()
 
-    weighty = manipulate_cipher_bit(weight, 1)
+weights = []
 
-    weighty = np.asarray(weighty)
+for i in range(len(weighty)):
+    for j in range(len(weighty[i])):
+        weights.append(weighty[i][j])
 
-    for i in range(len(weighty)):
-        weighty[i] = weighty[i].flatten()
+weights = [abs(ele) for ele in weights]
+weights = sorted(weights, reverse=True)
 
-    weights = []
+print(weights[0:10])
 
-    for i in range(len(weighty)):
-        for j in range(len(weighty[i])):
-            weights.append(weighty[i][j])
-
-    mean = np.mean(weights)
-    sigma = np.std(weights, dtype=np.float32)
-
-    means.append(mean)
-    sigmas.append(sigma)
-
-    print(ix, "\nMean:  ", mean, "\nSigma: ", sigma)
-
-means = np.asarray(means)
-sigmas = np.asarray(sigmas)
-
-min_mean = means[abs(means).argmin()]
-min_sigma = sigmas[np.isclose(means, min_mean)]
-max_mean = means[abs(means).argmax()]
-max_sigma = sigmas[np.isclose(means, max_mean)]
-
-avg_mean = np.mean(means)
-avg_sigma = np.mean(sigmas)
-
-print("Minimum Mean and Sigma = ", min_mean, ", ", min_sigma, "\nMaximum Mean and Sigma= ", max_mean, ", ", max_sigma,
-      "\nAverage Mean and Sigma = ", avg_mean, ", ", avg_sigma, "\n")
+# means = []
+# sigmas = []
+#
+# for ix in range(100):
+#     model = keras.models.load_model("MNIST_model")
+#     weight, bias = get_weights(model)
+#
+#     weighty = manipulate_cipher_bit(weight, 1)
+#
+#     weighty = np.asarray(weighty)
+#
+#     for i in range(len(weighty)):
+#         weighty[i] = weighty[i].flatten()
+#
+#     weights = []
+#
+#     for i in range(len(weighty)):
+#         for j in range(len(weighty[i])):
+#             weights.append(weighty[i][j])
+#
+#     mean = np.mean(weights)
+#     sigma = np.std(weights, dtype=np.float32)
+#
+#     means.append(mean)
+#     sigmas.append(sigma)
+#
+#     print(ix, "\nMean:  ", mean, "\nSigma: ", sigma)
+#
+# means = np.asarray(means)
+# sigmas = np.asarray(sigmas)
+#
+# min_mean = means[abs(means).argmin()]
+# min_sigma = sigmas[np.isclose(means, min_mean)]
+# max_mean = means[abs(means).argmax()]
+# max_sigma = sigmas[np.isclose(means, max_mean)]
+#
+# avg_mean = np.mean(means)
+# avg_sigma = np.mean(sigmas)
+#
+# print("Minimum Mean and Sigma = ", min_mean, ", ", min_sigma, "\nMaximum Mean and Sigma= ", max_mean, ", ", max_sigma,
+#       "\nAverage Mean and Sigma = ", avg_mean, ", ", avg_sigma, "\n")
